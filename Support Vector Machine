@@ -1,0 +1,44 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.svm import SVC  # Import the SVM classifier
+
+# Load the dataset
+# Replace 'your_data.csv' with the actual path to your dataset
+data = pd.read_csv('/content/Churn_Modelling(1).csv')
+
+# Drop unnecessary columns like 'RowNumber', 'CustomerId', 'Surname'
+data = data.drop(['RowNumber', 'CustomerId', 'Surname'], axis=1)
+
+# Convert categorical variables ('Geography', 'Gender') into numerical using one-hot encoding
+data = pd.get_dummies(data, columns=['Geography', 'Gender'], drop_first=True)
+
+# Assume 'Exited' is the target variable indicating churn (1 for churn, 0 for no churn)
+X = data.drop('Exited', axis=1)
+y = data['Exited']
+
+# Number of iterations
+num_iterations = 10
+accuracies = []
+
+# Loop for 10 iterations
+for i in range(num_iterations):
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=i)  # Use 'i' as the random seed
+
+    # Initialize the SVM classifier
+    svm_classifier = SVC(random_state=42)
+
+    # Fit the classifier to the training data
+    svm_classifier.fit(X_train, y_train)
+
+    # Predict on the test data
+    y_pred = svm_classifier.predict(X_test)
+
+    # Calculate accuracy for this iteration
+    accuracy = accuracy_score(y_test, y_pred)
+    accuracies.append(accuracy)
+
+# Print the accuracy results for each iteration
+for i, accuracy in enumerate(accuracies, start=1):
+    print(f'Iteration {i} - Accuracy: {accuracy}')
